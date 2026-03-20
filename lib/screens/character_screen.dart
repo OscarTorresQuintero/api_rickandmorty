@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:multiverso_explorer/models/character_model.dart';
 
 class CharacterScreen extends StatelessWidget {
-  const CharacterScreen({super.key});
+  final Character character;
+
+  const CharacterScreen({super.key, required this.character});
 
   @override
   Widget build(BuildContext context) {
@@ -9,7 +12,7 @@ class CharacterScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Personaje"),
+        title: Text(character.name),
       ),
       body: Column(
         children: [
@@ -17,14 +20,27 @@ class CharacterScreen extends StatelessWidget {
             height: size.height * 0.35,
             width: double.infinity,
             child: Image.network(
-              "https://rickandmortyapi.com/api/character/avatar/1.jpeg",
+              character.image,
               fit: BoxFit.cover,
             ),
           ),
           const SizedBox(height: 10),
-          const Text("Rick Sanchez"),
-          const Text("Status: Alive"),
+          cardData("Status:", character.status),
         ],
+      ),
+    );
+  }
+
+  Widget cardData(String text1, String text2) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Text(text1),
+            Text(text2),
+          ],
+        ),
       ),
     );
   }
