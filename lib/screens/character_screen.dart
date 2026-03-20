@@ -1,46 +1,114 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:multiverso_explorer/models/character_model.dart';
+import 'package:multiverso_explorer/provider/api_provider.dart';
 
 class CharacterScreen extends StatelessWidget {
   final Character character;
-
   const CharacterScreen({super.key, required this.character});
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(character.name),
+        centerTitle: true,
+        title: Text(character.name!),
       ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: size.height * 0.35,
-            width: double.infinity,
-            child: Image.network(
-              character.image,
-              fit: BoxFit.cover,
+      body: SizedBox(
+        height: double.infinity,
+        width: double.infinity,
+        child: Column(
+          children: [
+            SizedBox(
+              height: size.height * 0.35,
+              width: double.infinity,
+              child: Hero(
+                tag: character.id!,
+                child: Image.network(
+                  character.image!,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          cardData("Status:", character.status),
-        ],
+            Container(
+              padding: const EdgeInsets.all(10),
+              height: size.height * 0.14,
+              width: double.infinity,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  cardData("Status:", character.status!),
+                  cardData("Specie:", character.species!),
+                  cardData("Origin:", character.origin!.name!),
+                ],
+              ),
+            ),
+            const Text(
+              'Episodes',
+              style: TextStyle(fontSize: 17),
+            ),
+            EpisodeList(size: size, character: character)
+          ],
+        ),
       ),
     );
   }
 
   Widget cardData(String text1, String text2) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(10),
+    return Expanded(
+      child: Card(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(text1),
-            Text(text2),
+            Text(
+              text2,
+              overflow: TextOverflow.ellipsis,
+            )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class EpisodeList extends StatefulWidget {
+  const EpisodeList({super.key, required this.size, required this.character});
+
+  final Size size;
+  final Character character;
+
+  @override
+  State<EpisodeList> createState() => _EpisodeListState();
+}
+
+class _EpisodeListState extends State<EpisodeList> {
+  @override
+  void initState() {
+    super.initState();
+    final apiProvider = Provider.of<ApiProvider>(context, listen: false);
+    apiProvider.getEpisodes(widget.character);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final apiProvider = Provider.of<ApiProvider>(context);
+
+    return SizedBox(
+      height: widget.size.height * 0.35,
+      child: ListView.builder(
+        itemCount: apiProvider.episodes.length,
+        itemBuilder: (context, index) {
+          final episode = apiProvider.episodes[index];
+          return ListTile(
+            leading: Text(episode.episode!),
+            title: Text(episode.name!),
+            trailing: Text(episode.airDate!),
+          );
+        },
       ),
     );
   }
