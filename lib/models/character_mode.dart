@@ -74,6 +74,8 @@ class Character {
   String? url;
   DateTime? created;
 
+  bool isFavorite; // ❤️ NUEVO
+
   Character({
     this.id,
     this.name,
@@ -87,6 +89,7 @@ class Character {
     this.episode,
     this.url,
     this.created,
+    this.isFavorite = false, // ❤️ NUEVO
   });
 
   factory Character.fromJson(Map<String, dynamic> json) => Character(
@@ -102,12 +105,11 @@ class Character {
             ? null
             : Location.fromJson(json["location"]),
         image: json["image"],
-        episode: json["episode"] == null
-            ? []
-            : List<String>.from(json["episode"]!.map((x) => x)),
+        episode: List<String>.from(json["episode"] ?? []),
         url: json["url"],
         created:
             json["created"] == null ? null : DateTime.parse(json["created"]),
+        isFavorite: json["isFavorite"] ?? false, // ❤️ NUEVO
       );
 
   Map<String, dynamic> toJson() => {
@@ -124,6 +126,7 @@ class Character {
             episode == null ? [] : List<dynamic>.from(episode!.map((x) => x)),
         "url": url,
         "created": created?.toIso8601String(),
+        "isFavorite": isFavorite, // ❤️ NUEVO
       };
 }
 
